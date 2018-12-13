@@ -1,0 +1,250 @@
+{% extends "base_reports.html" %}
+{% block content %}
+{% load markdown_filter %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!-- Current language: {{ LANGUAGE_CODE }} -->
+<main role="main" class="container">
+
+  <div class="starter-template text-center">
+    <h1 style="text-align:center;">{{ report.name }}</h1>
+    <h3 style="text-align:center;">{{ org_name }}</h3>
+    <a style="text-align:center;" href="/reports/">Volver a listado de reportes</a>
+    <p>{{ report.description|markdown_filter|safe }}</p>
+  </div>
+
+<h2>{% trans "Table of content" %}</h2>
+<ul class="table-of-content">
+  <li><a href="#threat-model">{% trans "Threat model" %}</a>
+    <ul>
+      <li><a href="#risk-matrix">{% trans "Risk matrix" %}</a></li>
+      <li><a href="#threat-list">{% trans "Threat list" %}</a></li>
+    </ul>
+  </li>
+  <li><a href="#assessment-activities">{% trans "Assessment activities" %}</a></li>
+  <li><a href="#vulnerability-list">{% trans "Vulnerability complete list" %}</a></li>
+  <li><a href="#recommendation-list">{% trans "Recomendations and implementation roadmap" %}</a>
+    <ul>
+      {% for recommendation in recommendations %}
+      {% ifchanged recommendation.implementation_term.name %}
+      <li><a href="#{{ recommendation.implementation_term.name|slugify }}">{{ recommendation.implementation_term.name }}</a></li>
+      {% endifchanged %}
+      {% endfor %}
+    </ul>
+  </li>
+</ul>
+
+
+
+<h2 id="threat-model">{% trans "Threat model" %}</h2>
+
+<div class="starter-template" id="threats">
+  <h2 id="risk-matrix">{% trans "Risk matrix" %}</h2>
+</div>
+
+<table class="threat-table">
+  <tr>
+    <td rowspan="12" class="tdhead"><h4 style="transform: rotate(-90deg);">{% trans "Impact" %}</h4></td><td class="tdhead"></td><td colspan="10" class="tdhead"><h4>{% trans "Likelihood" %}</h4></td>
+  </tr>
+  <tr>
+    <td class="tdhead"></td>
+    <td class="tdhead">1</td>
+    <td class="tdhead">2</td>
+    <td class="tdhead">3</td>
+    <td class="tdhead">4</td>
+    <td class="tdhead">5</td>
+    <td class="tdhead">6</td>
+    <td class="tdhead">7</td>
+    <td class="tdhead">8</td>
+    <td class="tdhead">9</td>
+    <td class="tdhead">10</td>
+  </tr>
+{% for matrix in matrix_axis reversed %}
+
+<tr class="{% cycle 'row1' 'row2' %}">
+  <td class="tdhead">{{ matrix }}</td>
+  {% for matriy in matrix_axis %}
+  <td class="risktd r{% widthratio matrix 1 matriy %}">
+
+    {% for threat in threats %}
+      {% if threat.likelihood == matriy and threat.impact == matrix %}
+      <a href="#T{{ threat.number }}" data-toggle="tooltip" title="{{ threat.title }}">T{{ threat.number }}</a><br>
+      {% endif %}
+    {% endfor %}
+  </td>
+  {% endfor %}
+</tr>
+{% endfor %}
+</table>
+
+<div class="starter-template" id="threats">
+  <h2 id="threat-list">{% trans "Threat list" %}</h2>
+</div>
+
+<ul>
+{% for threat in threats %}
+    <li><a href="#T{{ threat.number }}">T{{ threat.number }}) {{ threat.title }}</a></li>
+{% endfor %}
+</ul>
+
+<p style="text-align: center;">L: {% trans "Likelihood" %} | I: {% trans "Impact" %}</p>
+
+<table class="threat-table">
+  <tr class="tdhead">
+    <td>#</td>
+    <td>{% trans "Title" %}</td>
+    <td>{% trans "Description" %}</td>
+    <td>L</td>
+    <td>I</td>
+    <td>RL</td>
+    <td>{% trans "Field" %}</td>
+  </tr>
+  {% for threat in threats %}
+  <tr class="{% if threat.risk_level >= 70 %}table-red{% elif threat.risk_level >= 40 %}table-yellow{% else %}table-green{% endif %}" id="T{{ threat.number }}">
+    <td><b>T{{ threat.number }}</b></td>
+    <td><b>{{ threat.title }}</b></td>
+    <td>{% if threat.description %}{{ threat.description|markdown_filter|safe }}{% endif %}</td>
+    <td>{{ threat.likelihood }}</td>
+    <td>{{ threat.impact }}</td>
+    <td><b>{{ threat.risk_level }}</b></td>
+    <td><b>{{ threat.security_field.name }}</b></td>
+  </tr>
+
+  {% endfor %}
+  </table>
+
+  <div class="starter-template" id="threats">
+    <h2 id="assessment-activities">{% trans "Assessment Activities" %}</h2>
+  </div>
+
+  {% for activity in activities %}
+  <table style="margin-bottom: 10px;"><tr><td class="td-left">
+  <h3>{{ activity.name }})</h3>
+  {{ activity.description|markdown_filter|safe }}
+  {% trans "The vulnerabilities found during this activity were:" %}
+  <ul>
+  {% for vulnerability in activity.vulnerability_set.all %}
+  <li><a href="#V{{ vulnerability.number }}">V{{ vulnerability.number }}) {{ vulnerability.title }}</a></li>
+  {% endfor %}
+</ul>
+</td></tr></table>
+  {% endfor %}
+
+<div class="starter-template" id="threats">
+  <h2 id="vulnerability-list">{% trans "Vulnerabilities complete list" %}</h2>
+</div>
+
+<ul>
+{% for vulnerability in vulnerabilities %}
+<li><a href="#V{{ vulnerability.number }}">V{{ vulnerability.number }}) {{ vulnerability.title }}</a></li>
+{% endfor %}
+</ul>
+
+{% for vulnerability in vulnerabilities %}
+<table class="threat-table {% if vulnerability.max_risk_level >= 70 %}table-red{% elif vulnerability.max_risk_level >= 40 %}table-yellow{% else %}table-green{% endif %}" id="V{{ vulnerability.number }}">
+<tr>
+  <td colspan="2" class="td-left">
+    <h2>V{{ vulnerability.number }}) {{ vulnerability.title }}</h2>
+    <b>{% trans "Max risk level:" %}</b> {{ vulnerability.max_risk_level }}
+  </td>
+</tr>
+{% if vulnerability.description %}
+<tr>
+  <td colspan="2" class="td-left">
+    {{ vulnerability.description|markdown_filter|safe }}
+  </td>
+</tr>
+{% endif %}
+{% if vulnerability.other_info %}
+<tr>
+  <td colspan="2" class="td-left">
+    <b>{% trans "Other Information:" %}</b>
+    {{ vulnerability.other_info|markdown_filter|safe }}
+  </td>
+</tr>
+{% endif %}
+{% if vulnerability.references %}
+<tr>
+  <td colspan="2" class="td-left">
+    <b>{% trans "References:" %}</b>
+    {{ vulnerability.references|markdown_filter|safe }}
+  </td>
+</tr>
+{% endif %}
+<tr>
+  <td colspan="2" class="td-left">
+    <b>{% trans "Associated Threats:" %}</b><br>
+    {% for threat in vulnerability.threats_associated.all %}
+    <a href="#T{{ threat.number }}">T{{ threat.number }}) {{ threat.title }}</a><br>
+    {% endfor %}
+  </td>
+</tr>
+</table>
+
+{% endfor %}
+
+<div class="starter-template" id="threats">
+  <h2 id="recommendation-list">{% trans "Recommendations" %}</h2>
+</div>
+
+
+{% for recommendation in recommendations %}
+{% ifchanged recommendation.implementation_term.name %}
+{% if not forloop.first %}</ul>{% endif %}
+<h5>{{ recommendation.implementation_term.name }}</h5><ul>
+{% endifchanged %}
+<li><a href="#R{{ recommendation.number }}">R{{ recommendation.number }}) {{ recommendation.title }} {% if recommendation.highlight %}(Highlighted){% endif %}</a></li>
+{% endfor %}
+</ul>
+
+{% for recommendation in recommendations %}
+{% ifchanged recommendation.implementation_term.name %}
+<h4 style="padding-top:30px;" id="{{ recommendation.implementation_term.name|slugify }}">{{ recommendation.implementation_term.name }}</h4>
+{% endifchanged %}
+
+<table class="threat-table {% if recommendation.max_risk_level >= 70 %}table-red{% elif recommendation.max_risk_level >= 40 %}table-yellow{% else %}table-green{% endif %}  {% if recommendation.highlight %}highlighted{% endif %}" id="R{{ recommendation.number }}">
+<tr>
+  <td colspan="2" class="td-left">
+    <h2>R{{ recommendation.number }}) {{ recommendation.title }} {% if recommendation.highlight %}(Highlighted){% endif %}</h2>
+    <b>{% trans "Max risk level:" %}</b> {{ recommendation.max_risk_level }}
+  </td>
+</tr>
+{% if recommendation.description %}
+<tr>
+  <td colspan="2" class="td-left">
+    {{ recommendation.description|markdown_filter|safe }}
+  </td>
+</tr>
+{% endif %}
+{% if recommendation.needed_staff or recommendation.estimated_money_investment %}
+<tr>
+  <td class="td50" class="td-left">
+    <b>{% trans "Staff needed:" %}</b> {{ recommendation.needed_staff }}
+  </td>
+  <td class="td50" class="td-left">
+    <b>{% trans "Estimated money investment:" %}</b> {{ recommendation.estimated_money_investment }}
+  </td>
+</tr>
+{% endif %}
+{% if recommendation.how_to_get_help %}
+<tr>
+  <td colspan="2" class="td-left">
+    <b>{% trans "How to get help:" %}</b>
+    {{ recommendation.how_to_get_help|markdown_filter|safe }}
+  </td>
+</tr>
+{% endif %}
+<tr>
+  <td colspan="2" class="td-left">
+    <b>{% trans "Associated Threats:" %}</b><br>
+    {% for vulnerability in recommendation.vulnerabilities_associated.all %}
+    <a href="#V{{ vulnerability.number }}"><b>V{{ vulnerability.number }})</b> {{ vulnerability.title }}</a><br>
+    {% endfor %}
+  </td>
+</tr>
+</table>
+{% endfor %}
+
+
+</main><!-- /.container -->
+{% endblock %}

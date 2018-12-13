@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+          <h1>Reports</h1>
+          <button type="button" class="btn btn-primary internal-form" data-toggle="modal" data-target="#createUpdateModal" data-model="report" data-item="0">
+  Create new Report
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="createUpdateModal" tabindex="-1" role="dialog" aria-labelledby="createUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createUpdateModalLabel">Create new Report </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% load widget_tweaks %}
+        <form method="POST" class="post-form" id="createUpdateForm">{% csrf_token %}
+            {% render_field form.if class+="form-control internal-form" %}
+            <input name="id_reference_pk" id="id_reference_pk" type="hidden" value="">
+            {% render_field form.name placeholder="Report name" class+="form-control internal-form" %}
+            {{ form.name.errors }}
+            {% render_field form.description placeholder="Description" class+="form-control internal-form" %}
+            {{ form.description.errors }}
+            {% comment %}{% render_field form.recommendations_associated placeholder="Associated Recommendations" class+="form-control internal-form" %}{% endcomment %}
+            <select name="recommendations_associated" id="id_recommendations_associated" placeholder="Associated Recommendations" multiple="multiple" class="form-control internal-form">
+              {% for recommendation in recommendation_list %}
+              <option value="{{ recommendation.id }}">R{{ recommendation.number }}) {{ recommendation.title }}</option>
+              {% endfor %}
+            </select>
+            {{ form.recommendations_associated.errors }}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-model="report" data-itemr="" id="deleteModalButton"><i class="fa fa-trash-o delete-button" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onClick="createUpdateReport();">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">New message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+        <button type="button" class="btn btn-danger" id="deleteModalSubmit" onClick="deleteRecommendation(item);">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div class="table-responsive" id="report-list">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Report</th>
+                  <th>Description</th>
+                  <th>Recommendations Associated</th>
+                  <th>See report</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for report in report_list %}
+                  <tr>
+                    <td>
+                      <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#createUpdateModal" data-model="report" data-item="{{ report.id }}" data-name="{{ report.name }}" data-description="{{ report.description }}" data-recommendations-associated="{% for recommendation in report.recommendations_associated.all %}{{ recommendation.number }},{% endfor %}">{{ report.name }}</button>
+                      </div>
+                    </td>
+                    <td>{{ report.description }}</td>
+                    <td>{% for recommendation in report.recommendations_associated.all %}
+  <button type="button" class="btn btn-info" id="deleteModalSubmit" onClick="someFunction({{ recommendation.number }});">R{{ recommendation.number }}</button>
+{% endfor %}</td>
+                <td>
+                    <a class="btn btn-warning" href="/report/view_html/{{ report.id }}">HTML</a>
+                    <a class="btn btn-secondary disabled" href="#">ODT</a>
+                </td>
+                  </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
+          </div>
+{% endblock %}

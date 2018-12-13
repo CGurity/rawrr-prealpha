@@ -1,0 +1,34 @@
+{% load markdown_filter %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Recommendation</th>
+      <th>HL</th>
+      <th>Description</th>
+      <th>Implementation Term</th>
+      <th>Max risk level</th>
+      <th>Vulnerabilities Associated</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for recommendation in recommendation_list %}
+      <tr>
+        <td>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-{% if not recommendation.vulnerabilities_associated.all %}danger{% else %}warning{% endif %}" data-toggle="modal" data-target="#createUpdateModal" data-model="recommendation" data-item="{{ recommendation.number }}" data-title="{{ recommendation.title }}" data-description="{{ recommendation.description }}" data-implementation-term="{{ recommendation.implementation_term.id }}" data-highlight="{{ recommendation.highlight }}" data-needed-staff="{{ recommendation.needed_staff }}" data-estimated-money-investment="{{ recommendation.estimated_money_investment }}" data-how-to-get-help="{{ recommendation.how_to_get_help }}" data-vulnerabilities-associated="{% for vulnerability in recommendation.vulnerabilities_associated.all %}{{ vulnerability.number }},{% endfor %}">R{{ recommendation.number }}</button>
+          </div>
+        </td>
+        <td>{{ recommendation.title }}</td>
+        <td>{{ recommendation.highlight }}</td>
+        <td>{{ recommendation.description|markdown_filter|safe }}</td>
+        <td>{{ recommendation.implementation_term }}</td>
+        <td>{{ recommendation.max_risk_level }}</td>
+        <td>{% for vulnerability in recommendation.vulnerabilities_associated.all %}
+<button type="button" class="btn btn-info" id="deleteModalSubmit" onClick="someFunction({{ vulnerability.number }});">V{{ vulnerability.number }}</button>
+{% endfor %}</td>
+      </tr>
+    {% endfor %}
+
+  </tbody>
+</table>

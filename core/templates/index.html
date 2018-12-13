@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block content %}
+          <h1>Dashboard</h1>
+
+          <section class="row text-center placeholders">
+            <div class="col-6 col-sm-3 placeholder">
+              <h1>{{ t_count }}</h1>
+              <h4>Identified  Threats</h4>
+              <div class="text-muted"><a href="/risk_matrix">See risk matrix</a></div>
+            </div>
+            <div class="col-6 col-sm-3 placeholder">
+              <h1>{{ v_count }}</h1>
+              <h4>Discovered Vulnerabilities</h4>
+              <span class="text-muted"><a href="/vulnerabilities"><span class="badge badge-warning">{{ v_badge }}</span> not tied to risks</a></span>
+            </div>
+            <div class="col-6 col-sm-3 placeholder">
+              <h1>{{ r_count }}</h1>
+              <h4>Developed Recommendations</h4>
+              <span class="text-muted"><a href="/recommendations"><span class="badge badge-warning">{{ r_badge }}</span> not tied to vulnerabilities</a></span>
+            </div>
+            <div class="col-6 col-sm-3 placeholder">
+              <h1 class="alert-warning">{{ t_avg.risk_level__avg|floatformat:2 }}%</h1>
+              <h4>Average risk level</h4>
+            </div>
+          </section>
+          <div class="row">
+          <div class="col-4 col-sm-4 placeholder">
+            <h2>Risk Matrix</h2>
+            <canvas id="myChart" width="100" height="100"></canvas>
+            <script>
+
+
+              var ctx = document.getElementById("myChart");
+              var myChart = new Chart(ctx, {
+                  type: 'bubble',
+                  data: {
+                    datasets: [
+          {
+            label: 'Amenazas',
+            data: [
+              {% for threat in threat_list %}
+              {
+                  x: {{ threat.likelihood }},
+                  y: {{ threat.impact }},
+                  r: ({{ threat.likelihood }}*{{ threat.impact }}*0.6)+2
+              },
+              {% endfor %}
+                  ],
+                  backgroundColor:"rgb(57, 17, 117, 0.3)",
+                  hoverBackgroundColor: "rgb(57, 17, 117, 0.6)",
+              },
+            ]
+                  },
+                  options: {
+                    tooltips: {
+                      enabled: false
+                    },
+                    legend: {
+                      display: false
+                    },
+                      scales: {
+                          yAxes: [{
+                              ticks: {
+                                  beginAtZero:true,
+                                  max: 10
+                              }
+                          }],
+                          xAxes: [{
+                              ticks: {
+                                  beginAtZero:true,
+                                  max: 10
+                              }
+                          }]
+                      },
+                      layout: {
+                        padding: {
+                            left: 25,
+                            right: 25,
+                            top: 25,
+                            bottom: 25
+                        }
+                      }
+                  }
+              });
+              $('#myChart').on('mousemove', function(e) {
+                var activePoint = myChart.getElementsAtEvent(e)[0];
+                if (activePoint) {
+                  // var label = myChart.data.labels[firstPoint._index];
+                  var value = myChart.data.datasets[activePoint._datasetIndex].data[activePoint._index];
+                   //putMessage('info','X: '+ value.x + ' Y: '+value.y );
+                   popThreats(value.y,value.x);
+                  //  console.log(value);
+               }
+
+
+              });
+              </script>
+          </div>
+          <div class="col-4 col-sm-4 placeholder" id="threats_pop">
+            Hover on chart points to see associated threats..
+          </div>
+          <div class="col-4 col-sm-4 placeholder">
+            <h2>Reports</h2>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>See</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for report in reports %}
+                <tr>
+                  <td>{{ report.name }}</td>
+                  <td>
+                    <a class="btn btn-warning" href="/report/view_html/{{ report.id }}">HTML</a>
+                    <a class="btn btn-secondary disabled" href="#">ODT</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {% endblock %}

@@ -1,0 +1,138 @@
+{% load static %}
+{% load i18n %}
+{% language 'en' %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Risk Asessment Workflow for Recomendation Roadmap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <!-- <link href="{% static 'css/dashboard.css' %}" rel="stylesheet"> -->
+    <style>
+    * {
+      font-family: "Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  }
+    .threat-table, th, td {
+      border: solid 1px;
+      text-align: center;
+    }
+
+    .threat-table a {
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    .td50 {
+      width: 50%;
+    }
+
+    .threat-table {
+      width: 100%;
+      margin: 8px 0px;
+    }
+
+    .table-red {
+      background-color: #f35456;
+      color: #eeeeee;
+    }
+
+    .table-yellow {
+      background-color: #f4624e;
+      color: #eeeeee;
+    }
+
+    .table-green {
+      background-color: #3d959e;
+      color: #eeeeee;
+    }
+
+    .risktd {
+      width: 10%;
+      height: 50px;
+    }
+
+    .row1 {
+      background-color: #aaaaaa;
+    }
+
+    .row2 {
+      background-color: white;
+    }
+
+    .tdhead {
+      background-color: grey;
+      color: white;
+      font-weight: bold;
+    }
+
+    .highlighted {
+      background-color: #944194;
+      color: white;
+    }
+
+    .starter-template {
+      padding-top: 30px;
+    }
+
+    .r70, .r80, .r90, .r100, .r72, .r81 {
+      background-color: #f35456;
+      color: #eeeeee;
+    }
+
+    .r60, .r63, .r64, .r50, .r54, .r56, .r40, .r45, .r48, .r49, .r30, .r36, .r42, .r35, .r32 {
+      background-color: #f48a4e;
+      color: #eeeeee;
+    }
+
+    .r20, .r27, .r24, .r28, .r25, .r10, .r9, .r8, .r7, .r6, .r5, .r4, .r3, .r2, .r1, .r18, .r16, .r14, .r21, .r12, .r15 {
+      background-color: #3d959e;
+      color: #eeeeee;
+    }
+
+    table td {
+      padding: 15px;
+    }
+
+    .td-left {
+      text-align: left;
+    }
+
+    .table-of-content li {
+      list-style: none;
+    }
+
+    </style>
+
+    <link href="{% static 'css/font-awesome.css' %}" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" ></script>
+
+  </head>
+
+  <body>
+
+
+          {% block content %}{% endblock %}
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
+    <script src="{% static 'js/csrf.js' %}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+
+    <!-- <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" ></script>
+  </body>
+</html>
+{% endlanguage %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+{% load markdown_filter %}
+          <h1>Assessment Activities</h1>
+          <button type="button" class="btn btn-primary internal-form" data-toggle="modal" data-target="#createUpdateModal" data-model="activity" data-item="0">
+  Create new Activity
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="createUpdateModal" tabindex="-1" role="dialog" aria-labelledby="createUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createUpdateModalLabel">Create new Asessment Activity </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% load widget_tweaks %}
+        <form method="POST" class="post-form" id="createUpdateForm">{% csrf_token %}
+            {% render_field form.if class+="form-control internal-form" %}
+            <input type="text" readonly name="id_id" maxlength="140" class="form-control internal-form" placeholder="Activity id" required="" id="id_id">
+            {% render_field form.name placeholder="Activity name" class+="form-control internal-form" %}
+            {{ form.name.errors }}
+            {% render_field form.description placeholder="Description" class+="form-control internal-form" %}
+            {{ form.description.errors }}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-model="activity" data-itemr="" id="deleteModalButton"><i class="fa fa-trash-o delete-button" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onClick="createUpdateActivity();">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">New message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+        <button type="button" class="btn btn-danger" id="deleteModalSubmit" onClick="deleteActivity(item);">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div class="table-responsive" id="activities-list">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Activity</th>
+                  <th>Description</th>
+                  <th>Associated Vulnerabilities</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for activity in activities_list %}
+                  <tr>
+                    <td>
+                      <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#createUpdateModal" data-model="activity" data-item="{{ activity.id }}" data-name="{{ activity.name }}" data-description="{{ activity.description }}" >{{ activity.id }}</button>
+                      </div>
+                    </td>
+                    <td>{{ activity.name }}</td>
+                    <td>{{ activity.description|markdown_filter|safe }}</td>
+                    <td>{{ activity.vulnerability_set.count }}</td>
+                  </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
+          </div>
+{% endblock %}

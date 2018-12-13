@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+          <h1>Threats</h1>
+          <button type="button" class="btn btn-primary internal-form" data-toggle="modal" data-target="#createUpdateModal" data-model="threat" data-item="0">
+  Create new Threat
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="createUpdateModal" tabindex="-1" role="dialog" aria-labelledby="createUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createUpdateModalLabel">Agregar Amenaza </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% load widget_tweaks %}
+        <form method="POST" class="post-form" id="createUpdateForm">{% csrf_token %}
+            {% render_field form.if class+="form-control internal-form" %}
+            {% render_field form.number placeholder="Threat number" class+="form-control internal-form invisible" %}
+            {{ form.number.errors }}
+            {% render_field form.title placeholder="Threat title" class+="form-control internal-form" %}
+            {{ form.title.errors }}
+            {% render_field form.description placeholder="Description" class+="form-control internal-form" %}
+            {{ form.description.errors }}
+            {% render_field form.impact placeholder="Impact" class+="form-control internal-form" %}
+            {{ form.impact.errors }}
+            {% render_field form.likelihood placeholder="Likelihood" class+="form-control internal-form" %}
+            {{ form.likelihood.errors }}
+            {% render_field form.security_field placeholder="Security Field" class+="form-control internal-form" %}
+            {{ form.security_field.errors }}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-itemr="" data-model="threat" id="deleteModalButton"><i class="fa fa-trash-o delete-button" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onClick="createUpdateThreat();">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">New message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+        <button type="button" class="btn btn-danger" id="deleteModalSubmit" onClick="deleteThreat(item);">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div class="table-responsive" id="threat-list">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Threat</th>
+                  <th>Description</th>
+                  <th>Impact</th>
+                  <th>Likelihood</th>
+                  <th>Field</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for threat in threat_list %}
+                  <tr>
+                    <td>
+                      <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-{{ threat.security_field.color }}" data-toggle="modal" data-target="#createUpdateModal" data-model="threat" data-item="{{ threat.number }}" data-title="{{ threat.title }}" data-description="{{ threat.description }}" data-impact="{{ threat.impact }}" data-likelihood="{{ threat.likelihood }}" data-security-field="{{ threat.security_field.id }}">T{{ threat.number }}</button>
+                      </div>
+                    </td>
+                    <td>{{ threat.title }}</td>
+                    <td>{{ threat.description }}</td>
+                    <td>{{ threat.impact }}</td>
+                    <td>{{ threat.likelihood }}</td>
+                    <td>{{ threat.security_field }}</td>
+                  </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
+          </div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% load markdown_filter %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Activity</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for activity in activities_list %}
+      <tr>
+        <td>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#createUpdateModal" data-model="activity" data-item="{{ activity.id }}" data-name="{{ activity.name }}" data-description="{{ activity.description }}" >{{ activity.id }}</button>
+          </div>
+        </td>
+        <td>{{ activity.name }}</td>
+        <td>{{ activity.description|markdown_filter|safe }}</td>
+      </tr>
+    {% endfor %}
+
+  </tbody>
+</table>

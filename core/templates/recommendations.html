@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+{% load markdown_filter %}
+          <h1>Recommendations</h1>
+          <button type="button" class="btn btn-primary internal-form" data-toggle="modal" data-target="#createUpdateModal" data-model="recommendation" data-item="0">
+  Create new Recommendation
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="createUpdateModal" tabindex="-1" role="dialog" aria-labelledby="createUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createUpdateModalLabel">Create new Recommendation </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% load widget_tweaks %}
+        <form method="POST" class="post-form" id="createUpdateForm">{% csrf_token %}
+            {% render_field form.if class+="form-control internal-form" %}
+            {% render_field form.number placeholder="Recommendation number" class+="form-control internal-form invisible" %}
+            {{ form.number.errors }}
+            {% render_field form.title placeholder="Recommendation title" class+="form-control internal-form" %}
+            {{ form.title.errors }}
+            {% render_field form.highlight placeholder="Highlight" class+="switch-input form-control2 internal-form" %}
+          	<label for="id_highlight" class="switch-label">{{ form.highlight.label }}</label>
+            {{ form.highlight.errors }}
+            {% render_field form.description placeholder="Description" class+="form-control internal-form" %}
+            {{ form.description.errors }}
+            {{ form.implementation_term.label }}
+            {% render_field form.implementation_term placeholder="Implementation term" class+="form-control internal-form" %}
+            {{ form.implementation_term.errors }}
+            {% render_field form.needed_staff placeholder="Staff requirements" class+="form-control internal-form" %}
+            {{ form.needed_staff.errors }}
+            {% render_field form.estimated_money_investment placeholder="Money requirements" class+="form-control internal-form" %}
+            {{ form.estimated_money_investment.errors }}
+            {% render_field form.how_to_get_help placeholder="How to get help" class+="form-control internal-form" %}
+            {{ form.how_to_get_help.errors }}
+            {% comment %}{% render_field form.vulnerabilities_associated placeholder="Associated Vulnerabilities" class+="form-control internal-form" %}{% endcomment %}
+            <select name="vulnerabilities_associated" placeholder="Associated Vulnerabilities" id="id_vulnerabilities_associated" multiple="multiple" class="form-control internal-form">
+              {% for vulnerability in vulnerability_list %}
+              <option value="{{ vulnerability.id }}">V{{ vulnerability.number }}) {{ vulnerability.title }}</option>
+              {% endfor %}
+            </select>
+            {{ form.vulnerabilities_associated.errors }}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-model="recommendation" data-itemr="" id="deleteModalButton"><i class="fa fa-trash-o delete-button" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onClick="createUpdateRecommendation();">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">New message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+        <button type="button" class="btn btn-danger" id="deleteModalSubmit" onClick="deleteRecommendation(item);">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div class="table-responsive" id="recommendation-list">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Recommendation</th>
+                  <th>HL</th>
+                  <th>Description</th>
+                  <th>Implementation Term</th>
+                  <th>Max risk level</th>
+                  <th>Vulnerabilities Associated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for recommendation in recommendation_list %}
+                  <tr>
+                    <td>
+                      <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-{% if not recommendation.vulnerabilities_associated.all %}danger{% else %}warning{% endif %}" data-toggle="modal" data-target="#createUpdateModal" data-model="recommendation" data-item="{{ recommendation.number }}" data-title="{{ recommendation.title }}" data-description="{{ recommendation.description }}" data-highlight="{{ recommendation.highlight }}" data-implementation-term="{{ recommendation.implementation_term.id }}" data-needed-staff="{{ recommendation.needed_staff }}" data-estimated-money-investment="{{ recommendation.estimated_money_investment }}" data-how-to-get-help="{{ recommendation.how_to_get_help }}" data-vulnerabilities-associated="{% for vulnerability in recommendation.vulnerabilities_associated.all %}{{ vulnerability.number }},{% endfor %}">R{{ recommendation.number }}</button>
+                      </div>
+                    </td>
+                    <td>{{ recommendation.title }}</td>
+                    <td>{{ recommendation.highlight }}</td>
+                    <td>{{ recommendation.description|markdown_filter|safe }}</td>
+                    <td>{{ recommendation.implementation_term }}</td>
+                    <td>{{ recommendation.max_risk_level }}</td>
+                    <td>{% for vulnerability in recommendation.vulnerabilities_associated.all %}
+  <button type="button" class="btn btn-info" id="deleteModalSubmit" onClick="someFunction({{ vulnerability.number }});">V{{ vulnerability.number }}</button>
+{% endfor %}</td>
+                  </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
+          </div>
+{% endblock %}

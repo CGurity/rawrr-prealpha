@@ -1,0 +1,30 @@
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Threat</th>
+      <th>Description</th>
+      <th>Impact</th>
+      <th>Likelihood</th>
+      <th>Field</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for threat in threat_list %}
+      <tr>
+        <td>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-{{ threat.security_field.color }}" data-toggle="modal" data-target="#createUpdateModal" data-model="threat" data-item="{{ threat.number }}" data-title="{{ threat.title }}" data-description="{{ threat.description }}" data-impact="{{ threat.impact }}" data-likelihood="{{ threat.likelihood }}" data-security-field="{{ threat.security_field.id }}">T{{ threat.number }}</button>
+          </div>
+        </td>
+        <td>{{ threat.title }}</td>
+        <td>{{ threat.description }}</td>
+        <td>{{ threat.impact }}</td>
+        <td>{{ threat.likelihood }}</td>
+        <td>{{ threat.security_field }}</td>
+      </tr>
+    {% endfor %}
+
+  </tbody>
+</table>

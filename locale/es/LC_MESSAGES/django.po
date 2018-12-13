@@ -1,0 +1,119 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-09-24 01:43+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: core/templates/view_report.html:16
+msgid "Table of content"
+msgstr "Índice de contenidos"
+
+#: core/templates/view_report.html:18 core/templates/view_report.html:39
+msgid "Threat model"
+msgstr "Análisis de riesgo"
+
+#: core/templates/view_report.html:20 core/templates/view_report.html:42
+msgid "Risk matrix"
+msgstr "Matriz de riesgo"
+
+#: core/templates/view_report.html:21 core/templates/view_report.html:81
+msgid "Threat list"
+msgstr "Listado de amenazas"
+
+#: core/templates/view_report.html:24
+msgid "Assessment activities"
+msgstr "Actividades de evaluación"
+
+#: core/templates/view_report.html:25
+msgid "Vulnerability complete list"
+msgstr "Lista completa de vulnerabilidades"
+
+#: core/templates/view_report.html:26
+msgid "Recomendations and implementation roadmap"
+msgstr "Recomendaciones y plan de implementación"
+
+#: core/templates/view_report.html:47 core/templates/view_report.html:90
+msgid "Impact"
+msgstr "Impacto"
+
+#: core/templates/view_report.html:47 core/templates/view_report.html:90
+msgid "Likelihood"
+msgstr "Probabilidad de Ocurrencia"
+
+#: core/templates/view_report.html:95
+msgid "Title"
+msgstr "Título"
+
+#: core/templates/view_report.html:96
+msgid "Description"
+msgstr "Descripción"
+
+#: core/templates/view_report.html:100
+msgid "Field"
+msgstr "Ámbito"
+
+#: core/templates/view_report.html:117
+msgid "Assessment Activities"
+msgstr "Actividades de evaluación"
+
+#: core/templates/view_report.html:124
+msgid "The vulnerabilities found during this activity were:"
+msgstr "Las vulnerabilidades encontradas durante esta actividad fueron:"
+
+#: core/templates/view_report.html:134
+msgid "Vulnerabilities complete list"
+msgstr "Lista completa de vulnerabilidades"
+
+#: core/templates/view_report.html:148 core/templates/view_report.html:209
+msgid "Max risk level:"
+msgstr "Nivel de riesgo máximo:"
+
+#: core/templates/view_report.html:161
+msgid "Other Information:"
+msgstr "Otra información:"
+
+#: core/templates/view_report.html:169
+msgid "References:"
+msgstr "Referencias:"
+
+#: core/templates/view_report.html:176 core/templates/view_report.html:239
+msgid "Associated Threats:"
+msgstr "Amenazas asociadas:"
+
+#: core/templates/view_report.html:187
+msgid "Recommendations"
+msgstr "Recomendaciones"
+
+#: core/templates/view_report.html:222
+msgid "Staff needed:"
+msgstr "Requerimientos de personal:"
+
+#: core/templates/view_report.html:225
+msgid "Estimated money investment:"
+msgstr "Inversión estimada de dinero:"
+
+#: core/templates/view_report.html:232
+msgid "How to get help:"
+msgstr "Cómo obtener ayuda:"
+
+#: v2/settings.py:141
+msgid "English"
+msgstr "Inglés"
+
+#: v2/settings.py:142
+msgid "Spanish"
+msgstr "Español"

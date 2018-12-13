@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+{% load markdown_filter %}
+          <h1>Vulnerabilities</h1>
+          <button type="button" class="btn btn-primary internal-form" data-toggle="modal" data-target="#createUpdateModal" data-model="vulnerability" data-item="0">
+  Create new Vulnerability
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="createUpdateModal" tabindex="-1" role="dialog" aria-labelledby="createUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createUpdateModalLabel">Create new Vulnerability </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% load widget_tweaks %}
+        <form method="POST" class="post-form" id="createUpdateForm">{% csrf_token %}
+            {% render_field form.if class+="form-control internal-form" %}
+            {% render_field form.number placeholder="Vulnerability number" class+="form-control internal-form invisible" %}
+            {{ form.number.errors }}
+            {% render_field form.title placeholder="Vulnerability title" class+="form-control internal-form" %}
+            {{ form.title.errors }}
+            {% render_field form.description placeholder="Description" class+="form-control internal-form" %}
+            {{ form.description.errors }}
+            {% render_field form.references placeholder="References" class+="form-control internal-form" %}
+            {{ form.references.errors }}
+            {% render_field form.other_info placeholder="Other Information" class+="form-control internal-form" %}
+            {{ form.other_info.errors }}
+            {% comment %}{% render_field form.threats_associated placeholder="Associated Threats" class+="form-control internal-form" %}{% endcomment %}
+            <select name="threats_associated" placeholder="Associated Threats" multiple="multiple" class="form-control internal-form large-multiple" id="id_threats_associated">
+              {% for threat in threat_list %}
+              <option value="{{ threat.id }}">T{{ threat.number }}) {{ threat.title }}</option>
+              {% endfor %}
+            </select>
+            {{ form.threats_associated.errors }}
+            {% render_field form.assessment placeholder="Associated Activity" class+="form-control internal-form" %}
+            {{ form.assessment.errors }}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-model="vulnerability" data-itemr="" id="deleteModalButton"><i class="fa fa-trash-o delete-button" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onClick="createUpdateVulnerability();">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">New message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+        <button type="button" class="btn btn-danger" id="deleteModalSubmit" onClick="deleteVulnerability(item);">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div class="table-responsive" id="vulnerability-list">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Vulnerability</th>
+                  <th>Description</th>
+                  <th>Assessment activity</th>
+                  <th>Other Information</th>
+                  <th>Max risk level</th>
+                  <th>Threats Associated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for vulnerability in vulnerability_list %}
+                  <tr>
+                    <td>
+                      <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-{% if not vulnerability.threats_associated.all %}danger{% else %}warning{% endif %}" data-toggle="modal" data-target="#createUpdateModal" data-model="vulnerability" data-item="{{ vulnerability.number }}" data-title="{{ vulnerability.title }}" data-description="{{ vulnerability.description }}" data-references="{{ vulnerability.references }}" data-other-info="{{ vulnerability.other_info }}" data-assessment-activity="{{ vulnerability.assessment.id }}" data-threats-associated="{% for threat in vulnerability.threats_associated.all %}{{ threat.id }},{% endfor %}">V{{ vulnerability.number }}</button>
+                      </div>
+                    </td>
+                    <td>{{ vulnerability.title }}</td>
+                    <td>{{ vulnerability.description|truncatechars:100|markdown_filter|safe }}</td>
+                    <td>{{ vulnerability.assessment }}</td>
+                    <td>{{ vulnerability.other_info|truncatechars:100|markdown_filter|safe }}</td>
+                    <td>{{ vulnerability.max_risk_level }}</td>
+                    <td>{% for threat in vulnerability.threats_associated.all %}
+  <button type="button" class="btn btn-{{ threat.security_field.color }}" id="deleteModalSubmit" onClick="someFunction({{ threat.number }});">T{{ threat.number }}</button>
+{% endfor %}</td>
+                  </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
+          </div>
+{% endblock %}

@@ -1,0 +1,418 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Risk Asessment Workflow for Recomendation Roadmap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
+    <link href="{% static 'css/rawrr.css' %}" rel="stylesheet">
+    <link href="{% static 'css/font-awesome.css' %}" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" ></script>
+
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #391175;">
+      <button class="navbar-toggler navbar-toggler-right hidden-lg-up" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="/">RAWRR</a>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">1. Assessment/Audit <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">2. Implementation</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">3. Monitoring</a>
+          </li>
+        </ul>
+        <span class="navbar-brand">Organization: {{ session_vars.org_name }} (<a href="{% url 'organizations' %}">change</a>)</span>
+      </div>
+</nav>
+    <!-- <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+
+
+    </nav> -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-sm-3 col-md-2 hidden-xs-down bg-faded sidebar">
+          <ul class="nav nav-pills flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="#">1. Risk Assessment</a>
+              <ul class="nav-submenu">
+                <li><a class="nav-link" href="/threats">Threats</a></li>
+                <li><a class="nav-link" href="/risk_matrix">Risk Matrix/Graphic</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">2. Vulnerability documentation</a>
+              <ul class="nav-submenu">
+                <li><a class="nav-link" href="/activities">Assessment activities</a></li>
+                <li><a class="nav-link" href="/vulnerabilities">Vulnerabilities <span class="badge badge-warning" data-toggle="tooltip" title="Vulnerabilities without risks associated">{{ v_badge }}</span></a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">3. Recommendation development</a>
+              <ul class="nav-submenu">
+                <li><a class="nav-link" href="/recommendations">Recommendations <span class="badge badge-warning" data-toggle="tooltip" title="Recommendations without vulnerabilities associated">{{ r_badge }}</span></a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">4. Roadmap Building and reports</a>
+              <ul class="nav-submenu">
+                <li><a class="nav-link" href="/reports">Reports</a></li>
+              </ul>
+            </li>
+          </ul>
+          <div id="messages" class="hola"></div>
+        </nav>
+
+        <main class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="{% static 'js/csrf.js' %}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script>
+    $('#deleteModal').on('show.bs.modal', function (event) {
+      $('#createUpdateModal').modal('hide')
+      var button = $(event.relatedTarget) // Button that triggered the modal
+      var itemr = $('#deleteModalButton').attr('data-itemr') // Extract info from data-* attributes
+      var model = $('#deleteModalButton').attr('data-model') // Extract info from data-* attributes
+      // var itemr = button.data('itemr') // Extract info from data-* attributes
+      // alert(itemr);
+      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+      var modald = $(this);
+      if (model == "threat"){
+        modald.find('.modal-title').text('Are you sure you want to delete T' + itemr + '?');
+        $("#deleteModalSubmit").attr("onclick","deleteThreat("+itemr+");");
+      } else if (model == "vulnerability") {
+        modald.find('.modal-title').text('Are you sure you want to delete V' + itemr + '?');
+        $("#deleteModalSubmit").attr("onclick","deleteVulnerability("+itemr+");");
+      } else if (model == "recommendation") {
+        modald.find('.modal-title').text('Are you sure you want to delete R' + itemr + '?');
+        $("#deleteModalSubmit").attr("onclick","deleteRecommendation("+itemr+");");
+      } else if (model == "report") {
+        modald.find('.modal-title').text('Are you sure you want to delete Report ' + itemr + '?');
+        $("#deleteModalSubmit").attr("onclick","deleteReport("+itemr+");");
+      } else if (model == "activity") {
+        modald.find('.modal-title').text('Are you sure you want to delete Assessment Activity ' + itemr + '?');
+        $("#deleteModalSubmit").attr("onclick","deleteActivity("+itemr+");");
+      }
+
+      // modal.find('.modal-body input').val(item)
+    })
+    $('#createUpdateModal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget) // Button that triggered the modal
+      var model = button.data('model') // Extract info from data-* attributes
+      var item = button.data('item')
+      if (item == "0"){
+        $('#deleteModalButton').addClass( "invisible" )
+      } else {
+        $('#deleteModalButton').attr("data-itemr", item);
+        $('#deleteModalButton').removeClass( "invisible" )
+      }
+      if (model == "threat"){
+        if (item == "0"){
+          // Create a new item
+          var modal = $(this)
+          modal.find('.modal-title').text('Create a new threat')
+          modal.find('#id_number').val("0")
+          modal.find('#id_impact').val("")
+          modal.find('#id_likelihood').val("")
+          modal.find('#id_title').val("")
+          modal.find('#id_description').val("")
+          modal.find('#id_security_field').val("")
+        } else {
+          // Update an existing item
+          var number = button.data('item') // Extract info from data-* attributes
+          var impact = button.data('impact') // Extract info from data-* attributes
+          var likelihood = button.data('likelihood') // Extract info from data-* attributes
+          var title = button.data('title') // Extract info from data-* attributes
+          var description = button.data('description')
+          var security_field = button.data('security-field')
+          var modal = $(this)
+          modal.find('.modal-title').text('Update T' + item + '?')
+          modal.find('#id_number').val(number)
+          modal.find('#id_impact').val(impact)
+          modal.find('#id_likelihood').val(likelihood)
+          modal.find('#id_title').val(title)
+          modal.find('#id_description').val(description)
+          modal.find('#id_security_field').val(security_field)
+          // modal.find('#deleteModalButton').attr("data-itemr", item);
+          // modal.find('.modal-body input').val(item)
+        }
+      }
+      if (model == "vulnerability"){
+        if (item == "0"){
+          // Create a new item
+          var modal = $(this)
+          modal.find('.modal-title').text('Create a new vulnerability')
+          modal.find('#id_number').val("0")
+          modal.find('#id_title').val("")
+          modal.find('#id_description').val("")
+          modal.find('#id_references').val("")
+          modal.find('#id_other_info').val("")
+          $("#id_threats_associated option:selected").prop('selected',false)
+          $("#id_assessment option:selected").prop('selected',false)
+        } else {
+          // Update an existing item
+          $("#id_threats_associated option:selected").prop('selected',false)
+          var number = button.data('item') // Extract info from data-* attributes
+          var title = button.data('title') // Extract info from data-* attributes
+          var description = button.data('description')
+          var references = button.data('references')
+          var other_info = button.data('other-info')
+          var threats_associated = button.data('threats-associated')
+          var assessment_activity = button.data('assessment-activity')
+          // pendiente de parsear amenazas asociadas en el seteo inicial
+          var modal = $(this)
+          modal.find('.modal-title').text('Update V' + item + '?')
+          modal.find('#id_title').val(title)
+          modal.find('#id_description').val(description)
+          modal.find('#id_references').val(references)
+          modal.find('#id_other_info').val(other_info)
+          modal.find('#id_number').val(number)
+          modal.find('#id_assessment').val(assessment_activity)
+          $.each(threats_associated.split(","), function(i,e){
+              $("#id_threats_associated option[value='" + e + "']").prop("selected", true);
+          });
+
+          // modal.find('#deleteModalButton').attr("data-itemr", item);
+          // modal.find('.modal-body input').val(item)
+        }
+      }
+      if (model == "recommendation"){
+        if (item == "0"){
+          // Create a new item
+          var modal = $(this)
+          modal.find('.modal-title').text('Create a new recommendation')
+          modal.find('#id_number').val("0")
+          modal.find('#id_title').val("")
+          modal.find('#id_description').val("")
+          modal.find('#id_implementation_term').val("")
+          modal.find('#id_needed_staff').val("")
+          modal.find('#id_estimated_money_investment').val("")
+          modal.find('#id_how_to_get_help').val("")
+          modal.find('#id_references').val("")
+          modal.find('#id_other_info').val("")
+          modal.find('#id_highlight').prop("checked", false)
+          $("#id_vulnerabilities_associated option:selected").prop('selected',false)
+        } else {
+          // Update an existing item
+          $("#id_vulnerabilities_associated option:selected").prop('selected',false)
+          var number = button.data('item') // Extract info from data-* attributes
+          var title = button.data('title') // Extract info from data-* attributes
+          var description = button.data('description')
+          var implementation_term = button.data('implementation-term')
+          var needed_staff = button.data('needed-staff')
+          var estimated_money_investment = button.data('estimated-money-investment')
+          var how_to_get_help = button.data('how-to-get-help')
+          var highlight = button.data('highlight')
+          var vulnerabilities_associated = button.data('vulnerabilities-associated')
+          var modal = $(this)
+          modal.find('.modal-title').text('Update R' + item + '?')
+          modal.find('#id_title').val(title)
+          modal.find('#id_description').val(description)
+          if (highlight == "True") {
+            modal.find('#id_highlight').prop("checked", true);
+          } else {
+            modal.find('#id_highlight').prop("checked", false);
+          }
+          modal.find('#id_implementation_term').val(implementation_term)
+          modal.find('#id_needed_staff').val(needed_staff)
+          modal.find('#id_estimated_money_investment').val(estimated_money_investment)
+          modal.find('#id_how_to_get_help').val(how_to_get_help)
+          modal.find('#id_number').val(number)
+          $.each(vulnerabilities_associated.split(","), function(i,e){
+              $("#id_vulnerabilities_associated option[value='" + e + "']").prop("selected", true);
+          });
+          // modal.find('#deleteModalButton').attr("data-itemr", item);
+          // modal.find('.modal-body input').val(item)
+        }
+      }
+      if (model == "report"){
+        if (item == "0"){
+          // Create a new item
+          var modal = $(this)
+          modal.find('.modal-title').text('Create a new report')
+          modal.find('#id_reference_pk').val("0")
+          modal.find('#id_name').val("")
+          modal.find('#id_description').val("")
+          $("#id_recommendations_associated option:selected").prop('selected',false)
+        } else {
+          // Update an existing item
+          $("#id_recommendations_associated option:selected").prop('selected',false)
+          var number = button.data('item') // Extract info from data-* attributes
+          var name = button.data('name') // Extract info from data-* attributes
+          var description = button.data('description')
+          var recommendations_associated = button.data('recommendations-associated')
+          var modal = $(this)
+          modal.find('.modal-title').text('Update Report ' + item + '-' + name + '?')
+          modal.find('#id_name').val(name)
+          modal.find('#id_description').val(description)
+          modal.find('#id_reference_pk').val(number)
+          $.each(recommendations_associated.split(","), function(i,e){
+              $("#id_recommendations_associated option[value='" + e + "']").prop("selected", true);
+          });
+          // modal.find('#deleteModalButton').attr("data-itemr", item);
+          // modal.find('.modal-body input').val(item)
+        }
+      }
+      if (model == "activity"){
+        if (item == "0"){
+          // Create a new item
+          var modal = $(this)
+          modal.find('.modal-title').text('Create a new assessment activity')
+          modal.find('#id_name').val("")
+          modal.find('#id_id').val("")
+          modal.find('#id_description').val("")
+        } else {
+          // Update an existing item
+          var id = button.data('item') // Extract info from data-* attributes
+          var name = button.data('name') // Extract info from data-* attributes
+          var description = button.data('description')
+          var modal = $(this)
+          modal.find('.modal-title').text('Update Activity: ' + name + '?')
+          modal.find('#id_id').val(id)
+          modal.find('#id_name').val(name)
+          modal.find('#id_description').val(description)
+        }
+      }
+      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    });
+
+    function createUpdateThreat(){
+      $.post( "/threats/createupdate/", $( "#createUpdateForm" ).serialize()).done(function( data ) {
+        $('#createUpdateModal').modal('hide')
+        putMessage("success",data);
+        $( "#threat-list" ).load( "/threat_list/" );
+        $( "#threat_chart" ).load( "/threat_chart/" );
+      });
+    };
+
+    function deleteThreat(threat){
+      $.post( "/threats/delete/"+ threat).done(function( data ) {
+        $('#deleteModal').modal('hide')
+        putMessage("warning",data);
+        $( "#threat-list" ).load( "/threat_list/" );
+        $( "#threat_chart" ).load( "/threat_chart/" );
+      });
+    };
+
+    function createUpdateActivity(){
+      $.post( "/activities/createupdate/", $( "#createUpdateForm" ).serialize()).done(function( data ) {
+        $('#createUpdateModal').modal('hide')
+        putMessage("success",data);
+        $( "#activities-list" ).load( "/activities_list/" );
+      });
+    };
+
+    function deleteActivity(activity){
+      $.post( "/activities/delete/"+ activity).done(function( data ) {
+        $('#deleteModal').modal('hide')
+        putMessage("warning",data);
+        $( "#activities-list" ).load( "/activities_list/" );
+      });
+    };
+
+    function createUpdateVulnerability(){
+      $.post( "/vulnerability/createupdate/", $( "#createUpdateForm" ).serialize()).done(function( data ) {
+        $('#createUpdateModal').modal('hide')
+        putMessage("success",data);
+        $( "#vulnerability-list" ).load( "/vulnerability_list/" );
+      });
+    };
+
+    function deleteVulnerability(vulnerability){
+      $.post( "/vulnerability/delete/"+ vulnerability).done(function( data ) {
+        $('#deleteModal').modal('hide')
+        putMessage("warning",data);
+        $( "#vulnerability-list" ).load( "/vulnerability_list/" );
+      });
+    };
+
+    function createUpdateRecommendation(){
+      $.post( "/recommendation/createupdate/", $( "#createUpdateForm" ).serialize()).done(function( data ) {
+        $('#createUpdateModal').modal('hide')
+        putMessage("success",data);
+        $( "#recommendation-list" ).load( "/recommendation_list/" );
+      });
+    };
+
+    function deleteRecommendation(recommendation){
+      $.post( "/recommendation/delete/"+ recommendation).done(function( data ) {
+        $('#deleteModal').modal('hide')
+        putMessage("warning",data);
+        $( "#recommendation-list" ).load( "/recommendation_list/" );
+      });
+    };
+
+    function createUpdateReport(){
+      $.post( "/report/createupdate/", $( "#createUpdateForm" ).serialize()).done(function( data ) {
+        $('#createUpdateModal').modal('hide')
+        putMessage("success",data);
+        $( "#report-list" ).load( "/report_list/" );
+      });
+    };
+
+    function deleteReport(report){
+      $.post( "/report/delete/"+ report).done(function( data ) {
+        $('#deleteModal').modal('hide')
+        putMessage("warning",data);
+        $( "#report-list" ).load( "/report_list/" );
+      });
+    };
+
+    function putMessage(level,message){
+      $('#messages').html( '<div class="alert alert-'+level+' alert-dismissible fade show" role="alert">' + message + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+    };
+    function popThreats(impact,likelihood){
+      $('#threats_pop').load('/pop_threats/'+impact+'/'+likelihood+'/');
+    }
+
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    $('#createUpdateModal').modal({
+        backdrop: 'static',
+        keyboard: false,
+        show: false
+    })
+    </script>
+
+
+
+    <!-- <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <!-- <script src="{% static 'js/bootstrap.min.js' %}"></script> -->
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <!-- <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script> -->
+  </body>
+</html>

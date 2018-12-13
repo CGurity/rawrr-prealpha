@@ -1,0 +1,10 @@
+
+
+                {% for threat in threats %}
+                <div class="alert alert-{{ threat.security_field.color }}" role="alert" data-toggle="modal" data-target="#createUpdateModal" data-model="threat" data-item="{{ threat.number }}" data-title="{{ threat.title }}" data-description="{{ threat.description }}" data-impact="{{ threat.impact }}" data-likelihood="{{ threat.likelihood }}" data-security-field="{{ threat.security_field.id }}">
+                  <h4 class="alert-heading">T{{ threat.number }}: {{ threat.title }}</h4>
+                  <p>{{ threat.security_field }}: {{ threat.description }}</p>
+                  <p>Risk_level: <b>{{ threat.risk_level }}</b></p>
+                </div>
+
+                {% endfor %}

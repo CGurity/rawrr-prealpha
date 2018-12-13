@@ -1,0 +1,30 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Report</th>
+      <th>Description</th>
+      <th>Recommendations Associated</th>
+      <th>See report</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for report in report_list %}
+      <tr>
+        <td>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#createUpdateModal" data-model="report" data-item="{{ report.id }}" data-name="{{ report.name }}" data-description="{{ report.description }}" data-recommendations-associated="{% for recommendation in report.recommendations_associated.all %}{{ recommendation.number }},{% endfor %}">{{ report.name }}</button>
+          </div>
+        </td>
+        <td>{{ report.description }}</td>
+        <td>{% for recommendation in report.recommendations_associated.all %}
+<button type="button" class="btn btn-info" id="deleteModalSubmit" onClick="someFunction({{ recommendation.number }});">R{{ recommendation.number }}</button>
+{% endfor %}</td>
+    <td>
+        <a class="btn btn-warning" href="/report/view_html/{{ report.id }}">HTML</a>
+        <a class="btn btn-secondary disabled" href="#">ODT</a>
+    </td>
+      </tr>
+    {% endfor %}
+
+  </tbody>
+</table>
